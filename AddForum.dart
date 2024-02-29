@@ -1,9 +1,51 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'HomeScreen.dart';
 import 'UserProfile.dart';
 import 'Forums.dart';
+import 'dart:io';
 
-class AddForum extends StatelessWidget {
+class AddForum extends StatefulWidget {
+  @override
+  _AddForumState createState() => _AddForumState();
+}
+
+class _AddForumState extends State<AddForum> {
+  PlatformFile? pickedFile;
+  String selectedSubject = '';
+
+  Future uploadFile() async {
+    final file = File(pickedFile!.path!);
+    // Implement file upload logic here
+  }
+
+  Future selectFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result == null) return;
+
+    setState(() {
+      pickedFile = result.files.first;
+    });
+  }
+
+  void selectSubject(String subject) {
+    setState(() {
+      selectedSubject = subject;
+    });
+  }
+
+  ElevatedButton buildSubjectButton(String subject) {
+    return ElevatedButton(
+      onPressed: () {
+        selectSubject(subject);
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: selectedSubject == subject ? Colors.blue : null,
+      ),
+      child: Text(subject),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +95,6 @@ class AddForum extends StatelessWidget {
           ),
         ],
         onTap: (int index) {
-          // Handle bottom navigation item taps
           if (index == 0) {
             Navigator.push(
               context,
@@ -85,7 +126,7 @@ class AddForum extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Title',
+              'Forum title',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
@@ -103,49 +144,48 @@ class AddForum extends StatelessWidget {
             SizedBox(height: 8),
             Row(
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement functionality for each subject button
-                  },
-                  child: Text('Computing'),
-                ),
+                buildSubjectButton('Computing'),
                 SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement functionality for each subject button
-                  },
-                  child: Text('Big Data'),
-                ),
+                buildSubjectButton('Big Data'),
                 SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement functionality for each subject button
-                  },
-                  child: Text('Cyber security'),
-                ),
+                buildSubjectButton('Cyber security'),
                 SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement functionality for each subject button
-                  },
-                  child: Text('Maths'),
-                ),
+                buildSubjectButton('Maths'),
               ],
             ),
             SizedBox(height: 16),
             Text(
-              'Text Here',
+              'Discussion',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
             Expanded(
               child: TextField(
-                maxLines: null, // Allow multiple lines
+                maxLines: null,
                 decoration: InputDecoration(
                   hintText: 'Type here',
                   border: OutlineInputBorder(),
                 ),
               ),
+            ),
+            if (pickedFile != null)
+              Expanded(
+                child: Container(
+                  color: Colors.blue[100],
+                  child: Center(
+                    child: Text(pickedFile!.name),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: selectFile,
+              child: const Text('Select File'),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: uploadFile,
+              child: const Text('Upload File'),
             ),
             SizedBox(height: 8),
             ElevatedButton(
